@@ -1,8 +1,8 @@
 # Laravel Recurring Models
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/mohammedmanssour/laravel-recurring-models.svg?style=flat-square)](https://packagist.org/packages/mohammedmanssour/laravel-recurring-models)
-[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/mohammedmanssour/laravel-recurring-models/run-tests.yml?branch=master&label=tests&style=flat-square)](https://github.com/mohammedmanssour/laravel-recurring-models/actions?query=workflow%3Arun-tests+branch%3Amain)
-[![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/mohammedmanssour/laravel-recurring-models/fix-php-code-style-issues.yml?branch=master&label=code%20style&style=flat-square)](https://github.com/mohammedmanssour/laravel-recurring-models/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
+[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/mohammedmanssour/laravel-recurring-models/run-tests.yml?branch=master&label=tests&style=flat-square)](https://github.com/mohammedmanssour/laravel-recurring-models/actions?query=workflow%3Arun-tests+branch%3Amaster)
+[![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/mohammedmanssour/laravel-recurring-models/fix-php-code-style-issues.yml?branch=master&label=code%20style&style=flat-square)](https://github.com/mohammedmanssour/laravel-recurring-models/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amaster)
 [![Total Downloads](https://img.shields.io/packagist/dt/mohammedmanssour/laravel-recurring-models.svg?style=flat-square)](https://packagist.org/packages/mohammedmanssour/laravel-recurring-models)
 
 Introducing our Laravel Recurring package - the ultimate solution for adding recurring functionality to your Laravel Models! Whether you need simple daily, weekly, or every n days recurrence, or more complex patterns like repeating a model on the second Friday of every month, our package has got you covered. With a seamless integration into your Laravel application, you can easily manage and automate recurring tasks with just a few lines of code.

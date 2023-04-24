@@ -37,8 +37,6 @@ class PendingComplexRepeat extends PendingRepeat
     public function endsAfter(int $times): static
     {
         throw new ComplexRepetionEndsAfterNotAvailableException();
-
-        return $this;
     }
 
     /**
