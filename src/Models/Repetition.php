@@ -94,7 +94,7 @@ class Repetition extends Model
         $driver = $query->getConnection()->getConfig('driver');
         match ($driver) {
             'mysql' => $query->whereRaw('(ABS(DATEDIFF(start_at, ?)) * 24 * 60 * 60) % `interval` = 0', [$date->toDateTimeString()]),
-            'sqlite' => $query->whereRaw('(FLOOR(ABS(julianday(start_at) - julianday(?))) * 24 * 60 * 60) % `interval` = 0', [$date->toDateTimeString()]),
+            'sqlite' => $query->whereRaw('(CAST(ABS(julianday(start_at) - julianday(?)) AS INT) * 24 * 60 * 60) % `interval` = 0', [$date->toDateTimeString()]),
             'pgsql' => $query->whereRaw('MOD(ABS(DATE_PART(\'day\', start_at::date) - DATE_PART(\'day\', ?::date))::INTEGER * 24 * 60 * 60, interval) = 0', [$date->toDateTimeString()]),
             default => throw new DriverNotSupportedException($driver),
         };
