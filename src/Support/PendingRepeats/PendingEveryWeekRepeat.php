@@ -2,9 +2,9 @@
 
 namespace MohammedManssour\LaravelRecurringModels\Support\PendingRepeats;
 
-use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use MohammedManssour\LaravelRecurringModels\Contracts\Repeatable;
+use MohammedManssour\LaravelRecurringModels\Exceptions\RepetitionEndsAfterNotAvailableException;
 
 class PendingEveryWeekRepeat extends PendingRepeat
 {
@@ -15,14 +15,11 @@ class PendingEveryWeekRepeat extends PendingRepeat
      */
     private Collection $days;
 
-    private int $times = 0;
-
     private Collection $rules;
 
     public function __construct(Repeatable $model)
     {
         parent::__construct($model);
-        $this->interval = 7 * 86400;
         $this->days = collect([]);
         $this->rules = collect([]);
     }
@@ -36,11 +33,6 @@ class PendingEveryWeekRepeat extends PendingRepeat
     {
         $this->days = collect(['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'])
             ->intersect($days)
-            ->map(fn ($day) => (object) [
-                'day' => $day,
-                'date' => $this->model->startsAt()->clone()->next($day),
-            ])
-            ->sort(fn ($dayA, $dayB) => $dayA->date->gte($dayB->date))
             ->values();
 
         return $this;
@@ -48,9 +40,7 @@ class PendingEveryWeekRepeat extends PendingRepeat
 
     public function endsAfter(int $times): static
     {
-        $this->times = $times;
-
-        return $this;
+        throw new RepetitionEndsAfterNotAvailableException();
     }
 
     public function rules(): array
@@ -65,56 +55,27 @@ class PendingEveryWeekRepeat extends PendingRepeat
     private function makeRules(): void
     {
         if ($this->days->isEmpty()) {
-            $this->makeGenericWeeklyRule();
+            $this->rules->push(
+                $this->getRule($this->model->repetitionBaseDate()->weekday())
+            );
 
             return;
         }
 
-        $this->rules = $this->days->map(fn ($day) => [
-            'start_at' => $day->date,
-            'interval' => $this->interval,
-        ]);
-
-        $endAt = $this->findEndAt($this->rules->first()['start_at']);
-
-        $this->rules->transform(fn ($rule) => [
-            ...$rule,
-            'end_at' => $endAt,
-        ]);
+        $this->rules = $this->days->map(fn ($day) => $this->getRule($day));
     }
 
-    private function makeGenericWeeklyRule()
+    private function getRule(string $day): array
     {
-        $start_at = $this->model->startsAt()->clone()->addSeconds($this->interval);
-        $this->rules->push([
-            'start_at' => $start_at,
-            'interval' => $this->interval,
-            'end_at' => $this->findEndAt($start_at),
-        ]);
-    }
+        $complexPattern = (new PendingComplexRepeat($this->model))
+            ->rule(weekday: $day);
 
-    private function findEndAt(Carbon $startAt): ?Carbon
-    {
         if ($this->end_at) {
-            return $this->end_at;
+            $complexPattern->endsAt($this->end_at);
         }
 
-        if (! $this->times) {
-            return null;
-        }
+        $rules = $complexPattern->rules();
 
-        if ($this->days->isEmpty()) {
-            return $startAt->clone()->addSeconds($this->times * $this->interval);
-        }
-
-        $endAt = $startAt->clone()->addSeconds(floor($this->times / $this->days->count()) * $this->interval);
-        $index = $this->times % $this->days->count() - 1;
-
-        if ($index < 0) {
-            return $endAt;
-        }
-        $endAt->next($this->days->get($index)->day);
-
-        return $endAt;
+        return $rules[0];
     }
 }

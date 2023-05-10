@@ -4,7 +4,7 @@ namespace MohammedManssour\LaravelRecurringModels\Support\PendingRepeats;
 
 use MohammedManssour\LaravelRecurringModels\Contracts\Repeatable;
 use MohammedManssour\LaravelRecurringModels\Enums\RepetitionType;
-use MohammedManssour\LaravelRecurringModels\Exceptions\ComplexRepetionEndsAfterNotAvailableException;
+use MohammedManssour\LaravelRecurringModels\Exceptions\RepetitionEndsAfterNotAvailableException;
 
 class PendingComplexRepeat extends PendingRepeat
 {
@@ -14,7 +14,7 @@ class PendingComplexRepeat extends PendingRepeat
         Repeatable $model
     ) {
         parent::__construct($model);
-        $this->start_at = $this->model->startsAt()->clone()->addDay();
+        $this->start_at = $this->model->repetitionBaseDate()->clone()->addDay();
     }
 
     public function rule(string $year = '*', string $month = '*', string $day = '*', string $week = '*', string $weekday = '*'): static
@@ -36,7 +36,7 @@ class PendingComplexRepeat extends PendingRepeat
      */
     public function endsAfter(int $times): static
     {
-        throw new ComplexRepetionEndsAfterNotAvailableException();
+        throw new RepetitionEndsAfterNotAvailableException();
     }
 
     /**

@@ -55,7 +55,7 @@ class Task extends Model implements RepeatableContract
 /**
  * define the base date that we would use to calculate repetition start_at
  */
-public function startsAt(): Carbon
+public function repetitionBaseDate(): Carbon
 {
     return $this->created_at;
 }
@@ -75,7 +75,7 @@ This will help you to create daily recurring rule for the model.
 $model->repeat()->daily()
 ```
 
-The recurrence will start the next day based on the `startsAt` returned value.
+The recurrence will start the next day based on the `repetitionBaseDate` returned value.
 
 #### 2. Every N Days Recurrence
 
@@ -85,7 +85,7 @@ This will help you to create every N Days recurring rules for the model.
 $model->repeat()->everyNDays(days: 3)
 ```
 
-The recurrence will start after n=3 days based on the `startsAt` returned value.
+The recurrence will start after n=3 days based on the `repetitionBaseDate` returned value.
 
 #### 3. Weekly Recurrence
 
@@ -95,7 +95,7 @@ This will help ypi create weekly recurrence rule for the model.
 $model->repeat()->weekly()
 ```
 
-The recurrence will start after 7 days based on the `startsAt` returned value.
+The recurrence will start after 7 days based on the `repetitionBaseDate` returned value.
 
 You can specify the days of the recurrence using the `on` method.
 

@@ -10,7 +10,7 @@ class PendingEveryNDaysRepeat extends PendingRepeat
     {
         parent::__construct($model);
         $this->interval = $days * 86400;
-        $this->start_at = $this->model->startsAt()->clone()->addSeconds($this->interval);
+        $this->start_at = $this->model->repetitionBaseDate()->clone()->addSeconds($this->interval);
     }
 
     public function endsAfter(int $times): static

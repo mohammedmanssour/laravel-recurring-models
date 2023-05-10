@@ -1,11 +1,12 @@
 <?php
 
-namespace MohammedManssour\LaravelRecurringModels\Support;
+namespace MohammedManssour\LaravelRecurringModels\Concerns;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use MohammedManssour\LaravelRecurringModels\Models\Repetition;
+use MohammedManssour\LaravelRecurringModels\Support\Repeat;
 
 /**
  * @property-read \Illuminate\Support\Collection<integer, \Modules\RecurringEvents\Entities\Repeat> $repeats
@@ -26,7 +27,7 @@ trait Repeatable
     /**
      * define the base date that we would use to calculate repetition start_at
      */
-    public function startsAt(): Carbon
+    public function repetitionBaseDate(): Carbon
     {
         return $this->created_at;
     }

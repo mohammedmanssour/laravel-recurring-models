@@ -4,7 +4,7 @@ namespace MohammedManssour\LaravelRecurringModels\Exceptions;
 
 use Throwable;
 
-class ComplexRepetionEndsAfterNotAvailableException extends \Exception
+class RepetitionEndsAfterNotAvailableException extends \Exception
 {
     public function __construct(int $code = 0, ?Throwable $previous = null)
     {
