@@ -41,7 +41,7 @@ class Task extends Model implements RepeatableContract
 
 ```php
 use MohammedManssour\LaravelRecurringModels\Contracts\Repeatable as RepeatableContract;
-use MohammedManssour\LaravelRecurringModels\Support\Repeatable;
+use MohammedManssour\LaravelRecurringModels\Concerns\Repeatable;
 
 class Task extends Model implements RepeatableContract
 {
