@@ -75,8 +75,8 @@ class Repetition extends Model
     public function scopeWhereOccurresBetween(Builder $query, Carbon $start, Carbon $end): Builder
     {
         $dates = CarbonPeriod::create(
-            $start->startOfHour(),
-            $end->startOfHour(),
+            $start,
+            $end,
         );
 
         foreach ($dates as $date) {

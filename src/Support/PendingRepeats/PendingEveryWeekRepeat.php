@@ -31,7 +31,7 @@ class PendingEveryWeekRepeat extends PendingRepeat
      */
     public function on(array $days): static
     {
-        $this->days = collect(['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'])
+        $this->days = collect($this->weekdays())
             ->intersect($days)
             ->values();
 
@@ -56,7 +56,9 @@ class PendingEveryWeekRepeat extends PendingRepeat
     {
         if ($this->days->isEmpty()) {
             $this->rules->push(
-                $this->getRule($this->model->repetitionBaseDate()->weekday())
+                $this->getRule(
+                    strtolower($this->model->repetitionBaseDate()->format('l'))
+                )
             );
 
             return;
@@ -68,7 +70,7 @@ class PendingEveryWeekRepeat extends PendingRepeat
     private function getRule(string $day): array
     {
         $complexPattern = (new PendingComplexRepeat($this->model))
-            ->rule(weekday: $day);
+            ->rule(weekday: array_search($day, $this->weekdays()));
 
         if ($this->end_at) {
             $complexPattern->endsAt($this->end_at);
@@ -77,5 +79,10 @@ class PendingEveryWeekRepeat extends PendingRepeat
         $rules = $complexPattern->rules();
 
         return $rules[0];
+    }
+
+    private function weekdays()
+    {
+        return ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
     }
 }

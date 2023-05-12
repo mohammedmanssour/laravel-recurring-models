@@ -94,7 +94,7 @@ class RepeatTest extends TestCase
             ->on($days)
             ->endsAt($endAt);
 
-        foreach ($days as $day) {
+        foreach ([0, 2, 4] as $day) {
             $this->assertDatabaseHas('repetitions', [
                 'start_at' => $this->task()->repetitionBaseDate()->addDay(),
                 'type' => 'complex',
