@@ -75,6 +75,8 @@ class RepeatTest extends TestCase
             ->repeat()
             ->weekly();
 
+        $this->assertEquals(1, $this->task()->repetitions()->count());
+
         $this->assertDatabaseHas('repetitions', [
             'start_at' => $this->task()->repetitionBaseDate()->addDay(),
             'type' => 'complex',

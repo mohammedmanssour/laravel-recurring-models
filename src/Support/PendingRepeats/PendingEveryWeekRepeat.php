@@ -81,6 +81,11 @@ class PendingEveryWeekRepeat extends PendingRepeat
         return $rules[0];
     }
 
+    public function __destruct()
+    {
+        $this->rules();
+    }
+
     private function weekdays()
     {
         return ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
