@@ -143,7 +143,7 @@ Task::whereOccurresOn(Carbon::make('2023-05-01'))->get()
 use `whereOccurresBetween` scope to get the models that occurres between two sepcific dates.
 
 ```
-Task::whereOccurresBetweeb(Carbon::make('2023-05-01'), Carbon::make('2023-05-30'))->get()
+Task::whereOccurresBetween(Carbon::make('2023-05-01'), Carbon::make('2023-05-30'))->get()
 ```
 
 #### 1. End Recurrance
