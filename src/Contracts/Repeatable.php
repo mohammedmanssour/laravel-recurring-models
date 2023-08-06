@@ -11,7 +11,7 @@ interface Repeatable
 {
     public function repetitions(): MorphMany;
 
-    public function repetitionBaseDate(?RepetitionType $type = null): Carbon;
+    public function repetitionBaseDate(RepetitionType $type = null): Carbon;
 
     public function repeat(): Repeat;
 }
