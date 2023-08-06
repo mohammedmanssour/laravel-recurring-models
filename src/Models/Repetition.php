@@ -2,7 +2,7 @@
 
 namespace MohammedManssour\LaravelRecurringModels\Models;
 
-use Carbon\Carbon;
+use Carbon\CarbonInterface as Carbon;
 use Carbon\CarbonPeriod;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -88,14 +88,16 @@ class Repetition extends Model
 
     private function simpleQuery(Builder $query, Carbon $date): Builder
     {
+        $secondsInDay = 86400;
+
         $query
             ->where('type', RepetitionType::Simple);
 
         $driver = $query->getConnection()->getConfig('driver');
         match ($driver) {
-            'mysql' => $query->whereRaw('(ABS(DATEDIFF(start_at, ?)) * 24 * 60 * 60) % `interval` = 0', [$date->toDateTimeString()]),
-            'sqlite' => $query->whereRaw('(CAST(ABS(julianday(start_at) - julianday(?)) AS INT) * 24 * 60 * 60) % `interval` = 0', [$date->toDateTimeString()]),
-            'pgsql' => $query->whereRaw('MOD(ABS(DATE_PART(\'day\', start_at::date) - DATE_PART(\'day\', ?::date))::INTEGER * 24 * 60 * 60, interval) = 0', [$date->toDateTimeString()]),
+            'mysql' => $query->whereRaw('(UNIX_TIMESTAMP(?)  - UNIX_TIMESTAMP(`start_at`)) % `interval` BETWEEN 0 AND ?', [$date->toDateTimeString(), $secondsInDay]),
+            'sqlite' => $query->whereRaw('(? - unixepoch(`start_at`)) % `interval` BETWEEN 0 AND ?', [$date->timestamp, $secondsInDay]),
+            'pgsql' => $query->whereRaw("MOD((? - DATE_PART('EPOCH', start_at))::INTEGER, interval) BETWEEN 0 AND ?", [$date->timestamp, $secondsInDay]),
             default => throw new DriverNotSupportedException($driver),
         };
 

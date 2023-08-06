@@ -16,7 +16,7 @@ class RepeatableTest extends TestCase
         $this->repetition($this->task(), '2023-04-23 00:00:00');
 
         $model = Task::whereOccurresOn(Carbon::make('2023-04-20 00:00:00'))->first();
-        $this->assertSame($this->task()->id, $model->id);
+        $this->assertTrue($this->task()->is($model));
 
         $model = Repetition::whereOccurresOn(Carbon::make('2023-04-25 00:00:00'))->first();
         $this->assertNull($model);
@@ -31,6 +31,6 @@ class RepeatableTest extends TestCase
             Carbon::make('2023-04-20 00:00:00'),
             Carbon::make('2023-04-25 00:00:00'),
         )->first();
-        $this->assertEquals($this->task()->id, $model->id);
+        $this->assertTrue($this->task()->is($model));
     }
 }
