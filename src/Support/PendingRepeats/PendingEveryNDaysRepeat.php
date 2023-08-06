@@ -3,6 +3,7 @@
 namespace MohammedManssour\LaravelRecurringModels\Support\PendingRepeats;
 
 use MohammedManssour\LaravelRecurringModels\Contracts\Repeatable;
+use MohammedManssour\LaravelRecurringModels\Enums\RepetitionType;
 
 class PendingEveryNDaysRepeat extends PendingRepeat
 {
@@ -10,7 +11,7 @@ class PendingEveryNDaysRepeat extends PendingRepeat
     {
         parent::__construct($model);
         $this->interval = $days * 86400;
-        $this->start_at = $this->model->repetitionBaseDate()->clone()->addSeconds($this->interval);
+        $this->start_at = $this->model->repetitionBaseDate(RepetitionType::Simple)->clone()->addSeconds($this->interval);
     }
 
     public function endsAfter(int $times): static

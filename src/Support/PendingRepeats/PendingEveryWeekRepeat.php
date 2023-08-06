@@ -4,6 +4,7 @@ namespace MohammedManssour\LaravelRecurringModels\Support\PendingRepeats;
 
 use Illuminate\Support\Collection;
 use MohammedManssour\LaravelRecurringModels\Contracts\Repeatable;
+use MohammedManssour\LaravelRecurringModels\Enums\RepetitionType;
 use MohammedManssour\LaravelRecurringModels\Exceptions\RepetitionEndsAfterNotAvailableException;
 
 class PendingEveryWeekRepeat extends PendingRepeat
@@ -57,7 +58,7 @@ class PendingEveryWeekRepeat extends PendingRepeat
         if ($this->days->isEmpty()) {
             $this->rules->push(
                 $this->getRule(
-                    strtolower($this->model->repetitionBaseDate()->format('l'))
+                    strtolower($this->model->repetitionBaseDate(RepetitionType::Complex)->format('l'))
                 )
             );
 
