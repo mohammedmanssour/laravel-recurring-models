@@ -11,18 +11,35 @@ class RepetitionTest extends TestCase
     use HasTask;
 
     /** @test */
-    public function it_ches_if_simple_repetition_occurres_on_specific_day()
+    public function it_checks_if_simple_repetition_occurres_on_specific_day()
     {
+        // repeat start at 2023-04-15 00:00:00
         $repetition = $this->repetition($this->task());
 
         $model = Repetition::whereOccurresOn(Carbon::make('2023-04-10 00:00:00'))->first();
         $this->assertNull($model);
 
-        $model = Repetition::whereOccurresOn(Carbon::make('2023-04-20 00:00:00'))->first();
-        $this->assertEquals($repetition->id, $model->id);
+        $model = Repetition::whereOccurresOn(Carbon::make('2023-04-20 23:00:00'))->first();
+        $this->assertTrue($repetition->is($model));
+
+        $model = Repetition::whereOccurresOn(Carbon::make('2023-04-16 23:00:00'))->first();
+        $this->assertFalse($repetition->is($model));
+
+        $model = Repetition::whereOccurresOn(Carbon::make('2023-04-17 23:00:00'))->first();
+        $this->assertFalse($repetition->is($model));
+
+        $model = Repetition::whereOccurresOn(Carbon::make('2023-04-18 23:00:00'))->first();
+        $this->assertFalse($repetition->is($model));
+
+        $model = Repetition::whereOccurresOn(Carbon::make('2023-04-19 23:00:00'))->first();
+        $this->assertFalse($repetition->is($model));
+
+        // ensure the day no matter what the hour is. usefull when handling timezones
+        $model = Repetition::whereOccurresOn(Carbon::make('2023-04-20 23:00:00'))->first();
+        $this->assertTrue($repetition->is($model));
 
         $model = Repetition::whereOccurresOn(Carbon::make('2023-04-25 00:00:00'))->first();
-        $this->assertEquals($repetition->id, $model->id);
+        $this->assertTrue($repetition->is($model));
     }
 
     /** @test */
@@ -37,13 +54,22 @@ class RepetitionTest extends TestCase
     /** @test */
     public function it_checks_if_simple_repetition_occurres_between_two_specific_dates()
     {
+        // repeat start at 2023-04-15 00:00:00
         $repetition = $this->repetition($this->task());
 
         $model = Repetition::whereOccurresBetween(
             Carbon::make('2023-04-20 00:00:00'),
             Carbon::make('2023-04-25 00:00:00'),
         )->first();
-        $this->assertEquals($repetition->id, $model->id);
+        $this->assertTrue($repetition->is($model));
+
+        $this->assertFalse(
+            Repetition::whereOccurresBetween(
+                Carbon::make('2023-04-10 00:00:00'),
+                Carbon::make('2023-04-14 00:00:00'),
+            )
+                ->exists()
+        );
     }
 
     /** @test */

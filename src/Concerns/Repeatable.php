@@ -2,9 +2,10 @@
 
 namespace MohammedManssour\LaravelRecurringModels\Concerns;
 
-use Carbon\Carbon;
+use Carbon\CarbonInterface as Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use MohammedManssour\LaravelRecurringModels\Enums\RepetitionType;
 use MohammedManssour\LaravelRecurringModels\Models\Repetition;
 use MohammedManssour\LaravelRecurringModels\Support\Repeat;
 
@@ -27,7 +28,7 @@ trait Repeatable
     /**
      * define the base date that we would use to calculate repetition start_at
      */
-    public function repetitionBaseDate(): Carbon
+    public function repetitionBaseDate(RepetitionType $type = null): Carbon
     {
         return $this->created_at;
     }
