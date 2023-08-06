@@ -2,7 +2,7 @@
 
 namespace MohammedManssour\LaravelRecurringModels\Concerns;
 
-use Carbon\Carbon;
+use Carbon\CarbonInterface as Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use MohammedManssour\LaravelRecurringModels\Models\Repetition;
