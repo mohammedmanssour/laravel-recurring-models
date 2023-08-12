@@ -10,6 +10,25 @@ class RepetitionTest extends TestCase
 {
     use HasTask;
 
+    /**
+     * @test
+     * */
+    public function it_checks_if_recurring_is_active_for_the_date()
+    {
+        // repeat start at 2023-04-15 00:00:00 and ends at 2023-04-15
+        $repetition = $this->repetition($this->task(), '2023-04-30');
+
+        $this->assertNull(Repetition::query()->whereActiveForTheDate(Carbon::make('2023-04-14 00:00:00'))->first());
+
+        $this->assertNull(Repetition::query()->whereActiveForTheDate(Carbon::make('2023-05-01 00:00:00'))->first());
+
+        $activeTestDates = ['2023-04-15', '2023-04-16', '2023-04-30'];
+        foreach ($activeTestDates as $date) {
+            $model = Repetition::query()->whereActiveForTheDate(Carbon::make("{$date} 00:00:00"))->first();
+            $this->assertTrue($model->is($repetition));
+        }
+    }
+
     /** @test */
     public function it_checks_if_simple_repetition_occurres_on_specific_day()
     {
@@ -40,6 +59,12 @@ class RepetitionTest extends TestCase
 
         $model = Repetition::whereOccurresOn(Carbon::make('2023-04-25 00:00:00'))->first();
         $this->assertTrue($repetition->is($model));
+
+        $date = Carbon::make('2023-04-25 00:00:00');
+        $model = Repetition::whereHasSimpleRecurringOn($date)->first();
+        $this->assertTrue($repetition->is($model));
+
+        $this->assertNull(Repetition::whereHasComplexRecurringOn($date)->first());
     }
 
     /** @test */
@@ -82,15 +107,18 @@ class RepetitionTest extends TestCase
         // repeats on second Friday of the month
         $repetition = Repetition::factory()->morphs($this->task())->complex(week: 2, weekday: Carbon::FRIDAY)->starts($this->task()->repetitionBaseDate())->create();
 
-        $model = Repetition::whereOccurresOn(Carbon::make('2023-05-12'))->first();
-        $this->assertNotNull($model);
-        $this->assertEquals(RepetitionType::Complex, $model->type);
-        $this->assertEquals($repetition->id, $model->id);
+        $date = Carbon::make('2023-05-12');
+        $model = Repetition::whereOccurresOn($date)->first();
+        $this->assertTrue($model->is($repetition));
 
-        $model = Repetition::whereOccurresOn(Carbon::make('2023-05-05'))->first();
-        $this->assertNull($model);
+        $model = Repetition::whereHasComplexRecurringOn($date)->first();
+        $this->assertTrue($model->is($repetition));
 
-        $model = Repetition::whereOccurresOn(Carbon::make('2023-05-19'))->first();
-        $this->assertNull($model);
+        $model = Repetition::whereHasComplexRecurringOn($date)->first();
+        $this->assertTrue($model->is($repetition));
+
+        $this->assertNull(Repetition::whereHasSimpleRecurringOn($date)->first());
+        $this->assertNull(Repetition::whereOccurresOn(Carbon::make('2023-05-05'))->first());
+        $this->assertNull(Repetition::whereOccurresOn(Carbon::make('2023-05-19'))->first());
     }
 }

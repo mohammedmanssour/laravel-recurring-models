@@ -59,16 +59,22 @@ class Repetition extends Model
     /*-----------------------------------------------------
     * scopes
     -----------------------------------------------------*/
-    public function scopeWhereOccurresOn(Builder $query, Carbon $date): Builder
+    public function scopeWhereActiveForTheDate(Builder $query, Carbon $date): Builder
     {
         return $query->where('start_at', '<=', $date->toDateTimeString())
             ->where(
                 fn ($query) => $query->whereNull('end_at')
                     ->orWhere('end_at', '>=', $date)
-            )
+            );
+    }
+
+    public function scopeWhereOccurresOn(Builder $query, Carbon $date): Builder
+    {
+        return $query
+            ->WhereActiveForTheDate($date)
             ->where(
-                fn ($query) => $query->where(fn ($query) => $this->simpleQuery($query, $date))
-                    ->orWhere(fn ($query) => $this->complexQuery($query, $date))
+                fn ($query) => $query->whereHasSimpleRecurringOn($date)
+                    ->orWhere(fn ($query) => $query->whereHasComplexRecurringOn($date))
             );
     }
 
@@ -86,7 +92,7 @@ class Repetition extends Model
         return $query;
     }
 
-    private function simpleQuery(Builder $query, Carbon $date): Builder
+    public function scopeWhereHasSimpleRecurringOn(Builder $query, Carbon $date): Builder
     {
         $secondsInDay = 86400;
 
@@ -104,9 +110,9 @@ class Repetition extends Model
         return $query;
     }
 
-    private function complexQuery(Builder $query, Carbon $date): Builder
+    public function scopeWhereHasComplexRecurringOn(Builder $query, Carbon $date)
     {
-        return $query->where('type', RepetitionType::Complex)
+        $query->where('type', RepetitionType::Complex)
             ->where(fn ($query) => $query->where('year', '*')->orWhere('year', $date->year))
             ->where(fn ($query) => $query->where('month', '*')->orWhere('month', $date->month))
             ->where(fn ($query) => $query->where('day', '*')->orWhere('day', $date->day))
