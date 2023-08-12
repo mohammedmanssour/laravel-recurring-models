@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Carbon;
-use MohammedManssour\LaravelRecurringModels\Enums\RepetitionType;
 use MohammedManssour\LaravelRecurringModels\Models\Repetition;
 use MohammedManssour\LaravelRecurringModels\Tests\Stubs\Support\HasTask;
 use MohammedManssour\LaravelRecurringModels\Tests\TestCase;
