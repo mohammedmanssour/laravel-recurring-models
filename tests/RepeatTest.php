@@ -69,6 +69,26 @@ class RepeatTest extends TestCase
     }
 
     /** @test */
+    public function it_creates_daily_repetition_with_timezone()
+    {
+        Carbon::setTestNowAndTimezone(
+            Carbon::make(self::NOW)->subHours(4)->toDateTimeString(),
+            'Asia/Dubai'
+        );
+
+        $this->task()
+            ->repeat()
+            ->daily();
+
+        $this->assertDatabaseHas('repetitions', [
+            'start_at' => $this->task()->repetitionBaseDate()->utc()->addDays(1),
+            'tz_offset' => 4 * 3600,
+            'interval' => 86400,
+            'end_at' => null,
+        ]);
+    }
+
+    /** @test */
     public function it_creates_weekly_repetition()
     {
         $this->task()
@@ -80,7 +100,7 @@ class RepeatTest extends TestCase
         $this->assertDatabaseHas('repetitions', [
             'start_at' => $this->task()->repetitionBaseDate()->addDay(),
             'type' => 'complex',
-            'weekday' => $this->task()->repetitionBaseDate()->weekday(),
+            'weekday' => $this->task()->repetitionBaseDate()->weekday() - 1,
             'end_at' => null,
         ]);
     }
@@ -100,10 +120,33 @@ class RepeatTest extends TestCase
             $this->assertDatabaseHas('repetitions', [
                 'start_at' => $this->task()->repetitionBaseDate()->addDay(),
                 'type' => 'complex',
-                'weekday' => $day,
+                'weekday' => ($day + 6) % 7,
                 'end_at' => $endAt,
             ]);
         }
+    }
+
+    /** @test */
+    public function it_creates_weekly_repetition_with_timezone()
+    {
+        Carbon::setTestNowAndTimezone(
+            Carbon::make(self::NOW)->subHours(4)->toDateTimeString(),
+            'Asia/Dubai'
+        );
+
+        $this->task()
+            ->repeat()
+            ->weekly();
+
+        $this->assertEquals(1, $this->task()->repetitions()->count());
+
+        $this->assertDatabaseHas('repetitions', [
+            'start_at' => $this->task()->repetitionBaseDate()->utc()->addDay(),
+            'tz_offset' => 4 * 3600,
+            'type' => 'complex',
+            'weekday' => $this->task()->repetitionBaseDate()->weekday() - 1,
+            'end_at' => null,
+        ]);
     }
 
     /** @test */
@@ -121,7 +164,7 @@ class RepeatTest extends TestCase
             'month' => '*',
             'day' => '*',
             'week' => 2,
-            'weekday' => Carbon::FRIDAY,
+            'weekday' => Carbon::FRIDAY - 1,
         ]);
     }
 
@@ -148,5 +191,32 @@ class RepeatTest extends TestCase
             ->repeat()
             ->complex(year: 2023, week: 2)
             ->endsAfter(3);
+    }
+
+    /**
+     * @test
+     * */
+    public function it_creates_complex_repetition_with_timezone()
+    {
+        Carbon::setTestNowAndTimezone(
+            Carbon::make(self::NOW)->subHours(4)->toDateTimeString(),
+            'Asia/Dubai'
+        );
+
+        $this->task()
+            ->repeat()
+            ->complex(week: 2, weekday: Carbon::FRIDAY);
+
+        $this->assertDatabaseHas('repetitions', [
+            'type' => RepetitionType::Complex,
+            'start_at' => $this->task()->repetitionBaseDate()->utc()->addDay(),
+            'tz_offset' => 4 * 3600,
+            'interval' => null,
+            'year' => '*',
+            'month' => '*',
+            'day' => '*',
+            'week' => 2,
+            'weekday' => Carbon::FRIDAY - 1,
+        ]);
     }
 }

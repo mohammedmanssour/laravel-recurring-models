@@ -8,6 +8,10 @@ return new class extends Migration
 {
     public function up()
     {
+        if (Schema::hasTable('repetitions')) {
+            return;
+        }
+
         Schema::create('repetitions', function (Blueprint $table) {
             $table->id();
             $table->morphs('repeatable');

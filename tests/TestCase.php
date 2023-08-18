@@ -2,23 +2,38 @@
 
 namespace MohammedManssour\LaravelRecurringModels\Tests;
 
+use Illuminate\Support\Carbon;
+use Orchestra\Testbench\TestCase as Orchestra;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Foundation\Bootstrap\LoadEnvironmentVariables;
-use Illuminate\Support\Carbon;
 use MohammedManssour\LaravelRecurringModels\LaravelRecurringModelsServiceProvider;
-use Orchestra\Testbench\TestCase as Orchestra;
 
 class TestCase extends Orchestra
 {
+    use RefreshDatabase;
+
+    const NOW = '2023-04-21 00:00:00';
+
     protected function setUp(): void
     {
         parent::setUp();
 
         Factory::guessFactoryNamesUsing(
-            fn (string $modelName) => 'MohammedManssour\\LaravelRecurringModels\\Database\\Factories\\'.class_basename($modelName).'Factory'
+            fn (string $modelName) => 'MohammedManssour\\LaravelRecurringModels\\Database\\Factories\\' . class_basename($modelName) . 'Factory'
         );
 
-        Carbon::setTestNow('2023-04-21');
+        Carbon::setTestNow(self::NOW);
+    }
+
+    /**
+     * Define database migrations.
+     *
+     * @return void
+     */
+    protected function defineDatabaseMigrations()
+    {
+        $this->loadMigrationsFrom(__DIR__ . '/Stubs/Migrations');
     }
 
     protected function getPackageProviders($app)
@@ -30,7 +45,7 @@ class TestCase extends Orchestra
 
     public function getEnvironmentSetUp($app)
     {
-        $app->useEnvironmentPath(__DIR__.'/..');
+        $app->useEnvironmentPath(__DIR__ . '/..');
         $app->bootstrapWith([LoadEnvironmentVariables::class]);
 
         $app['config']->set('database.default', 'testing');
@@ -52,13 +67,5 @@ class TestCase extends Orchestra
         //     'username' => env('PQSQL_DB_USERNAME', 'forge'),
         //     'password' => env('PQSQL_DB_PASSWORD', ''),
         // ]);
-
-        $tasksMigration = include __DIR__.'/./Stubs/Migrations/2023_04_18_000000_create_tasks_table.php';
-        $tasksMigration->down();
-        $tasksMigration->up();
-
-        $repetitionsMigration = include __DIR__.'/../database/migrations/create_recurring_models_table.php';
-        $repetitionsMigration->down();
-        $repetitionsMigration->up();
     }
 }

@@ -11,6 +11,8 @@ class LaravelRecurringModelsServiceProvider extends PackageServiceProvider
     {
         $package
             ->name('laravel-recurring-models')
-            ->hasMigration('create_recurring_models_table');
+            ->hasMigration('1682348400_create_recurring_models_table')
+            ->hasMigration('1692297663_add_tz_offset_to_repetitions_table')
+            ->runsMigrations($this->app->environment('testing'));
     }
 }

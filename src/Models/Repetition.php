@@ -28,7 +28,7 @@ class Repetition extends Model
 
     protected $fillable = [
         'type',
-        'start_at', 'interval', 'end_at',
+        'start_at', 'tz_offset', 'interval', 'end_at',
         'year', 'month', 'day', 'week', 'weekday',
     ];
 
@@ -36,6 +36,7 @@ class Repetition extends Model
         'type' => RepetitionType::class,
         'start_at' => 'datetime',
         'end_at' => 'datetime',
+        'tz_offset' => 'integer'
     ];
 
     protected static function newFactory()
