@@ -2,12 +2,12 @@
 
 namespace MohammedManssour\LaravelRecurringModels\Tests;
 
-use Illuminate\Support\Carbon;
-use Orchestra\Testbench\TestCase as Orchestra;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Foundation\Bootstrap\LoadEnvironmentVariables;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
 use MohammedManssour\LaravelRecurringModels\LaravelRecurringModelsServiceProvider;
+use Orchestra\Testbench\TestCase as Orchestra;
 
 class TestCase extends Orchestra
 {
@@ -20,7 +20,7 @@ class TestCase extends Orchestra
         parent::setUp();
 
         Factory::guessFactoryNamesUsing(
-            fn (string $modelName) => 'MohammedManssour\\LaravelRecurringModels\\Database\\Factories\\' . class_basename($modelName) . 'Factory'
+            fn (string $modelName) => 'MohammedManssour\\LaravelRecurringModels\\Database\\Factories\\'.class_basename($modelName).'Factory'
         );
 
         Carbon::setTestNow(self::NOW);
@@ -33,7 +33,7 @@ class TestCase extends Orchestra
      */
     protected function defineDatabaseMigrations()
     {
-        $this->loadMigrationsFrom(__DIR__ . '/Stubs/Migrations');
+        $this->loadMigrationsFrom(__DIR__.'/Stubs/Migrations');
     }
 
     protected function getPackageProviders($app)
@@ -45,7 +45,7 @@ class TestCase extends Orchestra
 
     public function getEnvironmentSetUp($app)
     {
-        $app->useEnvironmentPath(__DIR__ . '/..');
+        $app->useEnvironmentPath(__DIR__.'/..');
         $app->bootstrapWith([LoadEnvironmentVariables::class]);
 
         $app['config']->set('database.default', 'testing');

@@ -36,7 +36,7 @@ class Repetition extends Model
         'type' => RepetitionType::class,
         'start_at' => 'datetime',
         'end_at' => 'datetime',
-        'tz_offset' => 'integer'
+        'tz_offset' => 'integer',
     ];
 
     protected static function newFactory()

@@ -25,7 +25,7 @@ class PendingComplexRepeat extends PendingRepeat
             'month' => $month,
             'day' => $day,
             'week' => $week,
-            'weekday' => $weekday !== '*' ? ($weekday + 6) % 7 : '*' // php starts weekdays from Sunday. but databases starts weekdays from Monday, so we need to shift weekdays
+            'weekday' => $weekday !== '*' ? ($weekday + 6) % 7 : '*', // php starts weekdays from Sunday. but databases starts weekdays from Monday, so we need to shift weekdays
         ];
 
         return $this;
