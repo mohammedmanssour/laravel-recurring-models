@@ -100,7 +100,7 @@ class RepeatTest extends TestCase
         $this->assertDatabaseHas('repetitions', [
             'start_at' => $this->task()->repetitionBaseDate()->addDay(),
             'type' => 'complex',
-            'weekday' => $this->task()->repetitionBaseDate()->weekday() - 1,
+            'weekday' => $this->task()->repetitionBaseDate()->weekday(),
             'end_at' => null,
         ]);
     }
@@ -120,7 +120,7 @@ class RepeatTest extends TestCase
             $this->assertDatabaseHas('repetitions', [
                 'start_at' => $this->task()->repetitionBaseDate()->addDay(),
                 'type' => 'complex',
-                'weekday' => ($day + 6) % 7,
+                'weekday' => $day,
                 'end_at' => $endAt,
             ]);
         }
@@ -144,7 +144,7 @@ class RepeatTest extends TestCase
             'start_at' => $this->task()->repetitionBaseDate()->utc()->addDay(),
             'tz_offset' => 4 * 3600,
             'type' => 'complex',
-            'weekday' => $this->task()->repetitionBaseDate()->weekday() - 1,
+            'weekday' => $this->task()->repetitionBaseDate()->weekday(),
             'end_at' => null,
         ]);
     }
@@ -164,7 +164,7 @@ class RepeatTest extends TestCase
             'month' => '*',
             'day' => '*',
             'week' => 2,
-            'weekday' => Carbon::FRIDAY - 1,
+            'weekday' => Carbon::FRIDAY,
         ]);
     }
 
@@ -216,7 +216,7 @@ class RepeatTest extends TestCase
             'month' => '*',
             'day' => '*',
             'week' => 2,
-            'weekday' => Carbon::FRIDAY - 1,
+            'weekday' => Carbon::FRIDAY,
         ]);
     }
 }
