@@ -67,6 +67,28 @@ class RepetitionTest extends TestCase
     }
 
     /** @test */
+    public function it_checks_if_simple_repetition_occurres_on_specific_day_with_timezone()
+    {
+        Carbon::setTestNowAndTimezone(
+            Carbon::make(self::NOW)->subHours(4)->toDateTimeString(),
+            'Asia/Dubai'
+        );
+        // repetition starts at 2023-04-21 00:00:00 (Asia/Dubai) = 2023-04-20 20:00:00 UTC
+        $this->task()->repeat()->everyNDays(2);
+        $repetition = $this->task()->repetitions->first();
+
+        $model = Repetition::whereOccurresOn(now()->addDays(2))->first();
+        $this->assertTrue($model->is($repetition));
+
+        // using different timezone will yield to the same repetition model because repetition data is saved/calculated in utc
+        $model = Repetition::whereOccurresOn(now()->addDays(2)->setTimezone('Asia/Riyadh'))->first();
+        $this->assertTrue($model->is($repetition));
+
+        $model = Repetition::whereOccurresOn(now()->addDays(3)->setTimezone('Asia/Riyadh'))->first();
+        $this->assertNull($model);
+    }
+
+    /** @test */
     public function it_checks_if_simple_repetition_occurres_on_specific_dates_after_end_date()
     {
         $this->repetition($this->task(), '2023-04-23 00:00:00');
@@ -104,7 +126,11 @@ class RepetitionTest extends TestCase
         );
 
         // repeats on second Friday of the month
-        $repetition = Repetition::factory()->morphs($this->task())->complex(week: 2, weekday: Carbon::FRIDAY)->starts($this->task()->repetitionBaseDate())->create();
+        $repetition = Repetition::factory()
+            ->morphs($this->task())
+            ->complex(weekOfMonth: 2, weekday: Carbon::FRIDAY)
+            ->starts($this->task()->repetitionBaseDate())
+            ->create();
 
         $date = Carbon::make('2023-05-12');
         $model = Repetition::whereOccurresOn($date)->first();

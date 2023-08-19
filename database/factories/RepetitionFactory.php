@@ -25,6 +25,7 @@ class RepetitionFactory extends Factory
             'day' => null,
             'week' => null,
             'weekday' => null,
+            'week_of_month' => null,
             'end_at' => null,
         ];
     }
@@ -37,7 +38,7 @@ class RepetitionFactory extends Factory
         ]);
     }
 
-    public function complex(string $year = '*', string $month = '*', string $day = '*', string $week = '*', string $weekday = '*'): static
+    public function complex(string $year = '*', string $month = '*', string $day = '*', string $week = '*', string $weekOfMonth = '*', string $weekday = '*'): static
     {
         return $this->state([
             'type' => RepetitionType::Complex,
@@ -45,6 +46,7 @@ class RepetitionFactory extends Factory
             'month' => $month,
             'day' => $day,
             'week' => $week,
+            'week_of_month' => $weekOfMonth,
             'weekday' => $weekday,
         ]);
     }

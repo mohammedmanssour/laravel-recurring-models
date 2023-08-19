@@ -164,6 +164,7 @@ class RepeatTest extends TestCase
             'month' => '*',
             'day' => '*',
             'week' => 2,
+            'week_of_month' => '*',
             'weekday' => Carbon::FRIDAY,
         ]);
     }

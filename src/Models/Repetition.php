@@ -29,7 +29,7 @@ class Repetition extends Model
     protected $fillable = [
         'type',
         'start_at', 'tz_offset', 'interval', 'end_at',
-        'year', 'month', 'day', 'week', 'weekday',
+        'year', 'month', 'day', 'week', 'week_of_month', 'weekday',
     ];
 
     protected $casts = [
@@ -95,16 +95,17 @@ class Repetition extends Model
 
     public function scopeWhereHasSimpleRecurringOn(Builder $query, Carbon $date): Builder
     {
-        $secondsInDay = 86400;
+        $secondsInDay = 86399;
+        $timestamp = $date->clone()->utc()->timestamp;
 
         $query
             ->where('type', RepetitionType::Simple);
 
         $driver = $query->getConnection()->getConfig('driver');
         match ($driver) {
-            'mysql' => $query->whereRaw('(UNIX_TIMESTAMP(?)  - UNIX_TIMESTAMP(`start_at`)) % `interval` BETWEEN 0 AND ?', [$date->toDateTimeString(), $secondsInDay]),
-            'sqlite' => $query->whereRaw('(? - unixepoch(`start_at`)) % `interval` BETWEEN 0 AND ?', [$date->timestamp, $secondsInDay]),
-            'pgsql' => $query->whereRaw("MOD((? - DATE_PART('EPOCH', start_at))::INTEGER, interval) BETWEEN 0 AND ?", [$date->timestamp, $secondsInDay]),
+            'mysql' => $query->whereRaw('(?  - UNIX_TIMESTAMP(`start_at`)) % `interval` BETWEEN 0 AND ?', [$timestamp, $secondsInDay]),
+            'sqlite' => $query->whereRaw('(? - unixepoch(`start_at`)) % `interval` BETWEEN 0 AND ?', [$timestamp, $secondsInDay]),
+            'pgsql' => $query->whereRaw("MOD((? - DATE_PART('EPOCH', start_at))::INTEGER, interval) BETWEEN 0 AND ?", [$timestamp, $secondsInDay]),
             default => throw new DriverNotSupportedException($driver),
         };
 
@@ -117,7 +118,8 @@ class Repetition extends Model
             ->where(fn ($query) => $query->where('year', '*')->orWhere('year', $date->year))
             ->where(fn ($query) => $query->where('month', '*')->orWhere('month', $date->month))
             ->where(fn ($query) => $query->where('day', '*')->orWhere('day', $date->day))
-            ->where(fn ($query) => $query->where('week', '*')->orWhere('week', $date->weekOfMonth))
+            ->where(fn ($query) => $query->where('week', '*')->orWhere('week', $date->week))
+            ->where(fn ($query) => $query->where('week_of_month', '*')->orWhere('week_of_month', $date->weekOfMonth))
             ->where(fn ($query) => $query->where('weekday', '*')->orWhere('weekday', $date->dayOfWeek));
     }
 }
