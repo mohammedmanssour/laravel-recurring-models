@@ -26,16 +26,6 @@ class TestCase extends Orchestra
         Carbon::setTestNow(self::NOW);
     }
 
-    /**
-     * Define database migrations.
-     *
-     * @return void
-     */
-    protected function defineDatabaseMigrations()
-    {
-        $this->loadMigrationsFrom(__DIR__.'/Stubs/Migrations');
-    }
-
     protected function getPackageProviders($app)
     {
         return [

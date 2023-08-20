@@ -132,11 +132,45 @@ class RepetitionTest extends TestCase
             ->starts($this->task()->repetitionBaseDate())
             ->create();
 
-        $date = Carbon::make('2023-05-12');
+        $date = new Carbon('2023-05-12 00:00:00');
+        $model = Repetition::whereOccurresOn($date)->first();
+        $this->assertTrue($model->is($repetition));
+
+        $date = Carbon::make('2023-06-09');
         $model = Repetition::whereOccurresOn($date)->first();
         $this->assertTrue($model->is($repetition));
 
         $model = Repetition::whereHasComplexRecurringOn($date)->first();
+        $this->assertTrue($model->is($repetition));
+
+        $this->assertNull(Repetition::whereHasSimpleRecurringOn($date)->first());
+        $this->assertNull(Repetition::whereOccurresOn(Carbon::make('2023-05-05'))->first());
+        $this->assertNull(Repetition::whereOccurresOn(Carbon::make('2023-05-19'))->first());
+    }
+
+    /** @test */
+    public function it_checks_if_complex_repetition_occurres_on_specific_dates_with_timezone()
+    {
+        Carbon::setTestNowAndTimezone(
+            Carbon::make(self::NOW)->subHours(4)->toDateTimeString(),
+            'Asia/Dubai'
+        );
+
+        // repeats on second Friday of the month
+        $repetition = Repetition::factory()
+            ->morphs($this->task())
+            ->complex(weekOfMonth: 2, weekday: Carbon::FRIDAY)
+            ->starts($this->task()->repetitionBaseDate())
+            ->create([
+                'tz_offset' => 4 * 3600,
+            ]);
+
+        $date = new Carbon('2023-05-12 00:00:00');
+        $model = Repetition::whereOccurresOn($date)->first();
+        $this->assertTrue($model->is($repetition));
+
+        $date = Carbon::make('2023-06-09');
+        $model = Repetition::whereOccurresOn($date)->first();
         $this->assertTrue($model->is($repetition));
 
         $model = Repetition::whereHasComplexRecurringOn($date)->first();

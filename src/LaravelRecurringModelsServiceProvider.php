@@ -7,6 +7,15 @@ use Spatie\LaravelPackageTools\PackageServiceProvider;
 
 class LaravelRecurringModelsServiceProvider extends PackageServiceProvider
 {
+    public function boot()
+    {
+        parent::boot();
+
+        if ($this->app->environment('testing')) {
+            $this->loadMigrationsFrom(__DIR__.'/../tests/Stubs/Migrations');
+        }
+    }
+
     public function configurePackage(Package $package): void
     {
         $package

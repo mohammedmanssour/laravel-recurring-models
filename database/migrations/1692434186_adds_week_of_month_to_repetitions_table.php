@@ -9,7 +9,7 @@ return new class extends Migration
     public function up()
     {
         Schema::table('repetitions', function (Blueprint $table) {
-            $table->integer('week_of_month')->nullable()->after('week');
+            $table->string('week_of_month')->nullable()->after('week');
         });
     }
 

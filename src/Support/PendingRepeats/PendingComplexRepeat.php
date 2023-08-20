@@ -26,7 +26,7 @@ class PendingComplexRepeat extends PendingRepeat
             'day' => $day,
             'week' => $week,
             'week_of_month' => $weekOfMonth,
-            'weekday' => $weekday
+            'weekday' => $weekday,
         ];
 
         return $this;
