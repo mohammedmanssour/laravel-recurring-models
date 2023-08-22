@@ -14,7 +14,7 @@ class PendingComplexRepeat extends PendingRepeat
         Repeatable $model
     ) {
         parent::__construct($model);
-        $this->start_at = $this->model->repetitionBaseDate(RepetitionType::Complex)->toImmutable()->addDay();
+        $this->start_at = $this->model->repetitionBaseDate(RepetitionType::Complex)->toImmutable();
     }
 
     public function rule(string $year = '*', string $month = '*', string $day = '*', string $week = '*', string $weekOfMonth = '*', string $weekday = '*'): static

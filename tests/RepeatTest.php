@@ -98,7 +98,7 @@ class RepeatTest extends TestCase
         $this->assertEquals(1, $this->task()->repetitions()->count());
 
         $this->assertDatabaseHas('repetitions', [
-            'start_at' => $this->task()->repetitionBaseDate()->addDay(),
+            'start_at' => $this->task()->repetitionBaseDate(),
             'type' => 'complex',
             'weekday' => $this->task()->repetitionBaseDate()->weekday(),
             'end_at' => null,
@@ -118,7 +118,7 @@ class RepeatTest extends TestCase
 
         foreach ([0, 2, 4] as $day) {
             $this->assertDatabaseHas('repetitions', [
-                'start_at' => $this->task()->repetitionBaseDate()->addDay(),
+                'start_at' => $this->task()->repetitionBaseDate(),
                 'type' => 'complex',
                 'weekday' => $day,
                 'end_at' => $endAt,
@@ -141,7 +141,7 @@ class RepeatTest extends TestCase
         $this->assertEquals(1, $this->task()->repetitions()->count());
 
         $this->assertDatabaseHas('repetitions', [
-            'start_at' => $this->task()->repetitionBaseDate()->utc()->addDay(),
+            'start_at' => $this->task()->repetitionBaseDate()->utc(),
             'tz_offset' => 4 * 3600,
             'type' => 'complex',
             'weekday' => $this->task()->repetitionBaseDate()->weekday(),
@@ -158,7 +158,7 @@ class RepeatTest extends TestCase
 
         $this->assertDatabaseHas('repetitions', [
             'type' => RepetitionType::Complex,
-            'start_at' => $this->task()->repetitionBaseDate()->clone()->addDay(),
+            'start_at' => $this->task()->repetitionBaseDate(),
             'interval' => null,
             'year' => '*',
             'month' => '*',
@@ -210,7 +210,7 @@ class RepeatTest extends TestCase
 
         $this->assertDatabaseHas('repetitions', [
             'type' => RepetitionType::Complex,
-            'start_at' => $this->task()->repetitionBaseDate()->utc()->addDay(),
+            'start_at' => $this->task()->repetitionBaseDate()->utc(),
             'tz_offset' => 4 * 3600,
             'interval' => null,
             'year' => '*',
