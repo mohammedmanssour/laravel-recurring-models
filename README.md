@@ -55,7 +55,7 @@ class Task extends Model implements RepeatableContract
 /**
  * define the base date that we would use to calculate repetition start_at
  */
-public function repetitionBaseDate(): Carbon
+public function repetitionBaseDate(RepetitionType $type = null): Carbon
 {
     return $this->created_at;
 }
@@ -114,6 +114,7 @@ $model->repeat()
         month: '*',
         day: '*',
         week: '*',
+        weekOfMonth: '*',
         weekday: '*'
     )
 ```
@@ -123,7 +124,7 @@ $model->repeat()
 1. Repeat model on the second friday of every month.
 
 ```php
-$model->repeat()->complex(week: 2, weekday: Carbon::FRIDAY)
+$model->repeat()->complex(weekOfMonth: 2, weekday: Carbon::FRIDAY)
 ```
 
 2. Repeat model on the 15th day of every month.

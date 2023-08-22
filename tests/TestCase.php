@@ -4,12 +4,17 @@ namespace MohammedManssour\LaravelRecurringModels\Tests;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Foundation\Bootstrap\LoadEnvironmentVariables;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use MohammedManssour\LaravelRecurringModels\LaravelRecurringModelsServiceProvider;
 use Orchestra\Testbench\TestCase as Orchestra;
 
 class TestCase extends Orchestra
 {
+    use RefreshDatabase;
+
+    const NOW = '2023-04-21 00:00:00';
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -18,7 +23,7 @@ class TestCase extends Orchestra
             fn (string $modelName) => 'MohammedManssour\\LaravelRecurringModels\\Database\\Factories\\'.class_basename($modelName).'Factory'
         );
 
-        Carbon::setTestNow('2023-04-21');
+        Carbon::setTestNow(self::NOW);
     }
 
     protected function getPackageProviders($app)
@@ -52,13 +57,5 @@ class TestCase extends Orchestra
         //     'username' => env('PQSQL_DB_USERNAME', 'forge'),
         //     'password' => env('PQSQL_DB_PASSWORD', ''),
         // ]);
-
-        $tasksMigration = include __DIR__.'/./Stubs/Migrations/2023_04_18_000000_create_tasks_table.php';
-        $tasksMigration->down();
-        $tasksMigration->up();
-
-        $repetitionsMigration = include __DIR__.'/../database/migrations/create_recurring_models_table.php';
-        $repetitionsMigration->down();
-        $repetitionsMigration->up();
     }
 }

@@ -2,7 +2,7 @@
 
 namespace MohammedManssour\LaravelRecurringModels\Support\PendingRepeats;
 
-use Carbon\Carbon;
+use Carbon\CarbonInterface;
 use MohammedManssour\LaravelRecurringModels\Contracts\Repeatable;
 use MohammedManssour\LaravelRecurringModels\Support\RepeatCollection;
 
@@ -10,25 +10,25 @@ abstract class PendingRepeat
 {
     public Repeatable $model;
 
-    public Carbon $start_at;
+    public CarbonInterface $start_at;
 
     public int $interval;
 
-    public ?Carbon $end_at = null;
+    public ?CarbonInterface $end_at = null;
 
     public function __construct(Repeatable $model)
     {
         $this->model = $model;
     }
 
-    public function endsAt(Carbon $end_at): static
+    public function endsAt(CarbonInterface $end_at): static
     {
         $this->end_at = $end_at;
 
         return $this;
     }
 
-    public function startsAt(Carbon $start_at): static
+    public function startsAt(CarbonInterface $start_at): static
     {
         $this->start_at = $start_at;
 

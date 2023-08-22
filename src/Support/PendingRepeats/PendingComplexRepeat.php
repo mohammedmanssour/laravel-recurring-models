@@ -14,10 +14,10 @@ class PendingComplexRepeat extends PendingRepeat
         Repeatable $model
     ) {
         parent::__construct($model);
-        $this->start_at = $this->model->repetitionBaseDate(RepetitionType::Complex)->clone()->addDay();
+        $this->start_at = $this->model->repetitionBaseDate(RepetitionType::Complex)->toImmutable();
     }
 
-    public function rule(string $year = '*', string $month = '*', string $day = '*', string $week = '*', string $weekday = '*'): static
+    public function rule(string $year = '*', string $month = '*', string $day = '*', string $week = '*', string $weekOfMonth = '*', string $weekday = '*'): static
     {
         $this->rule = [
             'type' => RepetitionType::Complex,
@@ -25,6 +25,7 @@ class PendingComplexRepeat extends PendingRepeat
             'month' => $month,
             'day' => $day,
             'week' => $week,
+            'week_of_month' => $weekOfMonth,
             'weekday' => $weekday,
         ];
 
@@ -46,7 +47,8 @@ class PendingComplexRepeat extends PendingRepeat
     {
         return [[
             ...$this->rule,
-            'start_at' => $this->start_at,
+            'start_at' => $this->start_at->utc(),
+            'tz_offset' => $this->start_at->offset,
             'end_at' => $this->end_at,
         ]];
     }

@@ -31,8 +31,8 @@ class Repeat
         return new PendingEveryWeekRepeat($this->model);
     }
 
-    public function complex(string $year = '*', string $month = '*', string $day = '*', string $week = '*', string $weekday = '*'): PendingComplexRepeat
+    public function complex(string $year = '*', string $month = '*', string $day = '*', string $week = '*', string $weekOfMonth = '*', string $weekday = '*'): PendingComplexRepeat
     {
-        return (new PendingComplexRepeat($this->model))->rule($year, $month, $day, $week, $weekday);
+        return (new PendingComplexRepeat($this->model))->rule($year, $month, $day, $week, $weekOfMonth, $weekday);
     }
 }
