@@ -86,9 +86,11 @@ class Repetition extends Model
             $end,
         );
 
-        foreach ($dates as $date) {
-            $query->orWhere(fn ($query) => $query->whereOccurresOn($date));
-        }
+        $query->where(function (Builder $query) use ($dates) {
+            foreach ($dates as $date) {
+                $query->orWhere(fn ($query) => $query->whereOccurresOn($date));
+            }
+        });
 
         return $query;
     }
