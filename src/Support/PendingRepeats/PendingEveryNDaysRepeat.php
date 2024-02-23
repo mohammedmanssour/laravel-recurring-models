@@ -16,7 +16,8 @@ class PendingEveryNDaysRepeat extends PendingRepeat
 
     public function endsAfter(int $times): static
     {
-        $this->end_at = $this->start_at->addSeconds($times * $this->interval);
+        $this->end_at = clone $this->start_at;
+        $this->end_at->addSeconds($times * $this->interval);
 
         return $this;
     }
