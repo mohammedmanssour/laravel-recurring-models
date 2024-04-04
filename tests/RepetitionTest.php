@@ -1,5 +1,6 @@
 <?php
 
+use Carbon\CarbonImmutable;
 use Illuminate\Support\Carbon;
 use MohammedManssour\LaravelRecurringModels\Models\Repetition;
 use MohammedManssour\LaravelRecurringModels\Tests\Stubs\Support\HasTask;
@@ -179,5 +180,48 @@ class RepetitionTest extends TestCase
         $this->assertNull(Repetition::whereHasSimpleRecurringOn($date)->first());
         $this->assertNull(Repetition::whereOccurresOn(Carbon::make('2023-05-05'))->first());
         $this->assertNull(Repetition::whereOccurresOn(Carbon::make('2023-05-19'))->first());
+    }
+
+    /** @test */
+    public function it_returns_correct_period()
+    {
+        // repeat start at 2023-04-15 00:00:00
+        $repetition = $this->repetition($this->task(), '2023-04-30');
+        $start = CarbonImmutable::make('2023-04-15');
+
+        $period = $repetition->toPeriod();
+
+        foreach ($period as $i => $p) {
+            $this->assertEquals($start->addDays($i * 5), $p);
+        }
+    }
+
+    /** @test */
+    public function it_returns_correct_next_simple_repetition()
+    {
+        // repeat start at 2023-04-15 00:00:00
+        $repetition = $this->repetition($this->task(), '2023-04-30');
+
+        $this->assertEquals(Carbon::make('2023-04-20'), $repetition->nextOccurrence(Carbon::make('2023-04-15')));
+        $this->assertEquals(Carbon::make('2023-04-25'), $repetition->nextOccurrence(Carbon::make('2023-04-22')));
+        $this->assertEquals(null, $repetition->nextOccurrence(Carbon::make('2023-04-30')));
+    }
+
+    /** @test */
+    public function it_returns_correct_next_complex_repetition()
+    {
+        Carbon::setTestNow(
+            Carbon::make('2023-04-20')
+        );
+
+        // repeats on second Friday of the month
+        $repetition = Repetition::factory()
+            ->morphs($this->task())
+            ->complex(weekOfMonth: 2, weekday: Carbon::FRIDAY)
+            ->starts($this->task()->repetitionBaseDate())
+            ->create();
+
+        $this->assertEquals(Carbon::make('2023-05-12'), $repetition->nextOccurrence(Carbon::make('2023-04-20')));
+        $this->assertEquals(Carbon::make('2023-06-09'), $repetition->nextOccurrence(Carbon::make('2023-05-12')));
     }
 }

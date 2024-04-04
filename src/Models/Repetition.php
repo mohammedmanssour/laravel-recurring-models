@@ -4,6 +4,7 @@ namespace MohammedManssour\LaravelRecurringModels\Models;
 
 use Carbon\CarbonInterface as Carbon;
 use Carbon\CarbonPeriod;
+use Carbon\Exceptions\UnreachableException;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -21,6 +22,13 @@ use MohammedManssour\LaravelRecurringModels\Support\RepeatCollection;
  * @property \Carbon\Carbon $start_at
  * @property ?int $interval
  * @property ?\Carbon\Carbon $end_at
+ * @property int $tz_offset
+ * @property string $year
+ * @property string $month
+ * @property string $day
+ * @property string $week
+ * @property string $week_of_month
+ * @property string $weekday
  *
  * @method Builder whereActiveForTheDate(Builder $query, Carbon $date)
  */
@@ -49,6 +57,52 @@ class Repetition extends Model
     public function newCollection(array $models = []): RepeatCollection
     {
         return new RepeatCollection($models);
+    }
+
+    /**
+     * Returns CarbonPeriod of Repetition.
+     */
+    public function toPeriod(): CarbonPeriod
+    {
+        /** @var CarbonPeriod $period */
+        $period = CarbonPeriod::since($this->start_at, true);
+
+        if ($this->end_at) {
+            $period->until($this->end_at, true);
+        }
+
+        if ($this->type === RepetitionType::Simple) {
+            $period->seconds($this->interval);
+        } else {
+            $period->addFilter(function (Carbon $date) {
+                $date = $date->clone()->addSeconds($this->tz_offset);
+
+                return ($this->year === '*' || (int) $this->year === $date->year)
+                    && ($this->month === '*' || (int) $this->month === $date->month)
+                    && ($this->day === '*' || (int) $this->day === $date->day)
+                    && ($this->week === '*' || (int) $this->week === $date->week)
+                    && ($this->week_of_month === '*' || (int) $this->week_of_month === $date->weekOfMonth)
+                    && ($this->weekday === '*' || (int) $this->weekday === $date->dayOfWeek);
+            });
+        }
+
+        return $period;
+    }
+
+    public function nextOccurrence(Carbon $after): ?Carbon
+    {
+        if ($this->end_at?->lessThanOrEqualTo($after)) {
+            return null;
+        }
+
+        $period = $this->toPeriod();
+        $period->prependFilter(fn (Carbon $date) => $date->greaterThan($after));
+
+        try {
+            return $period->current();
+        } catch (UnreachableException) {
+            return null;
+        }
     }
 
     /*-----------------------------------------------------
