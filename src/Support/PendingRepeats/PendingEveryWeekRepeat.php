@@ -12,7 +12,7 @@ class PendingEveryWeekRepeat extends PendingRepeat
     /**
      * days
      *
-     * @var Collection<integer, object>
+     * @var Collection<int, object>
      */
     private Collection $days;
 

@@ -10,7 +10,7 @@ use MohammedManssour\LaravelRecurringModels\Models\Repetition;
 use MohammedManssour\LaravelRecurringModels\Support\Repeat;
 
 /**
- * @property-read \Illuminate\Support\Collection<integer, \Modules\RecurringEvents\Entities\Repeat> $repeats
+ * @property-read \Illuminate\Support\Collection<int, \Modules\RecurringEvents\Entities\Repeat> $repeats
  */
 trait Repeatable
 {
@@ -28,7 +28,7 @@ trait Repeatable
     /**
      * define the base date that we would use to calculate repetition start_at
      */
-    public function repetitionBaseDate(RepetitionType $type = null): Carbon
+    public function repetitionBaseDate(?RepetitionType $type = null): Carbon
     {
         return $this->created_at;
     }
