@@ -18,7 +18,7 @@ class RepeatTest extends TestCase
             ->everyNDays(5);
 
         $this->assertDatabaseHas('repetitions', [
-            'start_at' => $this->task()->repetitionBaseDate()->addDays(5),
+            'start_at' => $this->task()->repetitionBaseDate(),
             'interval' => 5 * 86400,
             'end_at' => null,
         ]);
@@ -33,7 +33,7 @@ class RepeatTest extends TestCase
             ->endsAt(Carbon::make('2023-04-25'));
 
         $this->assertDatabaseHas('repetitions', [
-            'start_at' => $this->task()->repetitionBaseDate()->addDays(2),
+            'start_at' => $this->task()->repetitionBaseDate(),
             'interval' => 2 * 86400,
             'end_at' => '2023-04-25 00:00:00',
         ]);
@@ -48,9 +48,9 @@ class RepeatTest extends TestCase
             ->endsAfter(5);
 
         $this->assertDatabaseHas('repetitions', [
-            'start_at' => $this->task()->repetitionBaseDate()->addDays(3),
+            'start_at' => $this->task()->repetitionBaseDate(),
             'interval' => 3 * 86400,
-            'end_at' => $this->task()->repetitionBaseDate()->addDays(18), // because five times means 5 repetitions
+            'end_at' => $this->task()->repetitionBaseDate()->addDays(15), // because five times means 5 repetitions
         ]);
     }
 
@@ -62,7 +62,7 @@ class RepeatTest extends TestCase
             ->daily();
 
         $this->assertDatabaseHas('repetitions', [
-            'start_at' => $this->task()->repetitionBaseDate()->addDays(1),
+            'start_at' => $this->task()->repetitionBaseDate(),
             'interval' => 86400,
             'end_at' => null,
         ]);
@@ -81,7 +81,7 @@ class RepeatTest extends TestCase
             ->daily();
 
         $this->assertDatabaseHas('repetitions', [
-            'start_at' => $this->task()->repetitionBaseDate()->utc()->addDays(1),
+            'start_at' => $this->task()->repetitionBaseDate()->utc(),
             'tz_offset' => 4 * 3600,
             'interval' => 86400,
             'end_at' => null,

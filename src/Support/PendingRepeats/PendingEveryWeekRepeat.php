@@ -22,6 +22,7 @@ class PendingEveryWeekRepeat extends PendingRepeat
     public function __construct(Repeatable $model)
     {
         parent::__construct($model);
+
         $this->days = collect([]);
         $this->rules = collect([]);
     }
@@ -62,7 +63,7 @@ class PendingEveryWeekRepeat extends PendingRepeat
         if ($this->days->isEmpty()) {
             $this->rules->push(
                 $this->getRule(
-                    strtolower($this->model->repetitionBaseDate(RepetitionType::Complex)->format('l'))
+                    strtolower($this->start_at->format('l'))
                 )
             );
 
@@ -92,6 +93,11 @@ class PendingEveryWeekRepeat extends PendingRepeat
     public function __destruct()
     {
         $this->rules();
+    }
+
+    public function type(): RepetitionType
+    {
+        return RepetitionType::Complex;
     }
 
     /**

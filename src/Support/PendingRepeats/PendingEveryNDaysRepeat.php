@@ -10,15 +10,13 @@ class PendingEveryNDaysRepeat extends PendingRepeat
     public function __construct(Repeatable $model, int $days)
     {
         parent::__construct($model);
+
         $this->interval = $days * 86400;
-        $this->start_at = $this->model->repetitionBaseDate(RepetitionType::Simple)->toImmutable()->addSeconds($this->interval);
     }
 
     public function endsAfter(int $times): static
     {
-        $this->end_at = $this->start_at->addSeconds($times * $this->interval);
-
-        return $this;
+        return $this->endsAt($this->start_at->addSeconds($times * $this->interval));
     }
 
     public function rules(): array
@@ -31,5 +29,10 @@ class PendingEveryNDaysRepeat extends PendingRepeat
                 'end_at' => $this->end_at,
             ],
         ];
+    }
+
+    public function type(): RepetitionType
+    {
+        return RepetitionType::Simple;
     }
 }
