@@ -35,7 +35,7 @@ abstract class PendingRepeat
         return $this;
     }
 
-    public function repeatitions(): RepeatCollection
+    public function repetitions(): RepeatCollection
     {
         /** @var RepeatCollection $collection */
         $collection = $this->model->repetitions()->makeMany($this->rules());
@@ -45,7 +45,7 @@ abstract class PendingRepeat
 
     public function save(): void
     {
-        $this->repeatitions()->save();
+        $this->repetitions()->save();
     }
 
     public function __destruct()
