@@ -40,6 +40,18 @@ class TestCase extends Orchestra
 
         $app['config']->set('database.default', 'testing');
 
+        $migrations = [
+            __DIR__.'/../database/migrations/1682348400_create_recurring_models_table.php',
+            __DIR__.'/../database/migrations/1692297663_add_tz_offset_to_repetitions_table.php',
+            __DIR__.'/../database/migrations/1692434186_adds_week_of_month_to_repetitions_table.php',
+            __DIR__.'/Stubs/Migrations/2023_04_18_000000_create_tasks_table.php',
+        ];
+
+        foreach ($migrations as $migrationPath) {
+            $migration = include $migrationPath;
+            $migration->up();
+        }
+
         // $app['config']->set('database.connections.mysql', [
         //     'driver' => 'mysql',
         //     'host' => env('MYSQL_DB_HOST', '127.0.0.1'),
