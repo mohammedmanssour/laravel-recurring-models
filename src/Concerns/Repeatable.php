@@ -8,15 +8,20 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 use MohammedManssour\LaravelRecurringModels\Enums\RepetitionType;
 use MohammedManssour\LaravelRecurringModels\Models\Repetition;
 use MohammedManssour\LaravelRecurringModels\Support\Repeat;
+use MohammedManssour\LaravelRecurringModels\Support\RepeatCollection;
 
 /**
- * @property-read \Illuminate\Support\Collection<int, \Modules\RecurringEvents\Entities\Repeat> $repeats
+ * @property-read RepeatCollection $repetitions
+ *
+ * @method Builder whereOccurresOn(Carbon $date)
+ * @method Builder whereOccurresBetween(Carbon $start, Carbon $end)
  */
 trait Repeatable
 {
     /*-----------------------------------------------------
     * Relations
     -----------------------------------------------------*/
+    /** @return MorphMany<Repetition> */
     public function repetitions(): MorphMany
     {
         return $this->morphMany(Repetition::class, 'repeatable');
@@ -44,6 +49,7 @@ trait Repeatable
     /*-----------------------------------------------------
     * Scopes
     -----------------------------------------------------*/
+    /** @param Builder<self> $query */
     public function scopeWhereOccurresOn(Builder $query, Carbon $date): Builder
     {
         return $query->whereHas(
@@ -52,6 +58,7 @@ trait Repeatable
         );
     }
 
+    /** @param Builder<self> $query */
     public function scopeWhereOccurresBetween(Builder $query, Carbon $start, Carbon $end): Builder
     {
         return $query->whereHas(

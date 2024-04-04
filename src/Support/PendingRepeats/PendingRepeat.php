@@ -37,17 +37,20 @@ abstract class PendingRepeat
 
     public function repeatitions(): RepeatCollection
     {
-        return $this->model->repetitions()->makeMany($this->rules());
+        /** @var RepeatCollection $collection */
+        $collection = $this->model->repetitions()->makeMany($this->rules());
+
+        return $collection;
     }
 
-    public function save()
+    public function save(): void
     {
-        return $this->repeatitions()->save();
+        $this->repeatitions()->save();
     }
 
     public function __destruct()
     {
-        return $this->save();
+        $this->save();
     }
 
     /**
