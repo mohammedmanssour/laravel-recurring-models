@@ -6,13 +6,16 @@ use Illuminate\Database\Eloquent\Collection;
 use MohammedManssour\LaravelRecurringModels\Models\Repetition;
 
 /**
- * @extends Collection<int,Repetition>
+ * @extends Collection<int, Repetition>
  */
 class RepeatCollection extends Collection
 {
     public function save(): void
     {
-        $this->transform(fn ($item) => $item->getAttributes());
-        Repetition::insert($this->items);
+        Repetition::insert($this->map(function (Repetition $item) {
+            $item->updateTimestamps();
+
+            return $item->getAttributes();
+        })->toArray());
     }
 }
