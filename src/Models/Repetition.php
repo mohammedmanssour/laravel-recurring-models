@@ -119,12 +119,12 @@ class Repetition extends Model
     public function scopeWhereHasSimpleRecurringOn(Builder $query, Carbon $date): Builder
     {
         $secondsInDay = 86399;
-        $timestamp = $date->clone()->utc()->timestamp;
+        $timestamp = $date->clone()->utc()->endOfDay()->timestamp;
+        $driver = $query->getConnection()->getConfig('driver'); // @phpstan-ignore-line
 
         $query
             ->where('type', RepetitionType::Simple);
 
-        $driver = $query->getConnection()->getConfig('driver'); // @phpstan-ignore-line
         match ($driver) {
             'mysql' => $query->whereRaw('(?  - UNIX_TIMESTAMP(`start_at`)) % `interval` BETWEEN 0 AND ?', [$timestamp, $secondsInDay]),
             'sqlite' => $query->whereRaw('(? - strftime("%s", `start_at`)) % `interval` BETWEEN 0 AND ?', [$timestamp, $secondsInDay]),
@@ -141,10 +141,11 @@ class Repetition extends Model
      */
     public function scopeWhereHasComplexRecurringOn(Builder $query, Carbon $date)
     {
-        $timestamp = $date->timestamp;
+        $timestamp = $date->clone()->utc()->endOfDay()->timestamp;
         $driver = $query->getConnection()->getConfig('driver'); // @phpstan-ignore-line
 
         $query->where('type', RepetitionType::Complex);
+
         if ($driver == 'mysql') {
             return $query->whereRaw("(`year` = '*' or `year` = YEAR(FROM_UNIXTIME(? + `tz_offset`)))", [$timestamp])
                 ->whereRaw("(`month` = '*' or `month` = MONTH(FROM_UNIXTIME(? + `tz_offset`)))", [$timestamp])
