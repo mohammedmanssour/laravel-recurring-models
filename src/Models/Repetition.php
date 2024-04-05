@@ -30,7 +30,11 @@ use MohammedManssour\LaravelRecurringModels\Support\RepeatCollection;
  * @property string $week_of_month
  * @property string $weekday
  *
- * @method Builder whereActiveForTheDate(Builder $query, Carbon $date)
+ * @method Builder<self> whereActiveForTheDate(Carbon $date)
+ * @method Builder<self> whereOccurresOn(Carbon $date)
+ * @method Builder<self> whereOccurresBetween(Carbon $start, Carbon $end)
+ * @method Builder<self> whereHasSimpleRecurringOn(Carbon $date)
+ * @method Builder<self> whereHasComplexRecurringOn(Carbon $date)
  */
 class Repetition extends Model
 {
@@ -141,8 +145,9 @@ class Repetition extends Model
         return $query
             ->WhereActiveForTheDate($date)
             ->where(
-                fn ($query) => $query->whereHasSimpleRecurringOn($date)
-                    ->orWhere(fn ($query) => $query->whereHasComplexRecurringOn($date))
+                fn (Builder $query) => $query
+                    ->whereHasSimpleRecurringOn($date)
+                    ->orWhere(fn (Builder $query) => $query->whereHasComplexRecurringOn($date))
             );
     }
 
@@ -159,7 +164,7 @@ class Repetition extends Model
 
         $query->where(function (Builder $query) use ($dates) {
             foreach ($dates as $date) {
-                $query->orWhere(fn ($query) => $query->whereOccurresOn($date));
+                $query->orWhere(fn (Builder $query) => $query->whereOccurresOn($date));
             }
         });
 
@@ -193,7 +198,7 @@ class Repetition extends Model
      * @param  Builder<self>  $query
      * @return Builder<self>
      */
-    public function scopeWhereHasComplexRecurringOn(Builder $query, Carbon $date)
+    public function scopeWhereHasComplexRecurringOn(Builder $query, Carbon $date): Builder
     {
         $timestamp = $date->clone()->utc()->endOfDay()->timestamp;
         $driver = $query->getConnection()->getConfig('driver'); // @phpstan-ignore-line
