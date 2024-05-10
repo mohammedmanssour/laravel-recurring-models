@@ -4,6 +4,7 @@ namespace MohammedManssour\LaravelRecurringModels\Models;
 
 use Carbon\CarbonInterface as Carbon;
 use Carbon\CarbonPeriod;
+use Carbon\Exceptions\UnreachableException;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -21,6 +22,19 @@ use MohammedManssour\LaravelRecurringModels\Support\RepeatCollection;
  * @property \Carbon\Carbon $start_at
  * @property ?int $interval
  * @property ?\Carbon\Carbon $end_at
+ * @property int $tz_offset
+ * @property string $year
+ * @property string $month
+ * @property string $day
+ * @property string $week
+ * @property string $week_of_month
+ * @property string $weekday
+ *
+ * @method Builder<self> whereActiveForTheDate(Carbon $date)
+ * @method Builder<self> whereOccurresOn(Carbon $date)
+ * @method Builder<self> whereOccurresBetween(Carbon $start, Carbon $end)
+ * @method Builder<self> whereHasSimpleRecurringOn(Carbon $date)
+ * @method Builder<self> whereHasComplexRecurringOn(Carbon $date)
  */
 class Repetition extends Model
 {
@@ -39,7 +53,7 @@ class Repetition extends Model
         'tz_offset' => 'integer',
     ];
 
-    protected static function newFactory()
+    protected static function newFactory(): RepetitionFactory
     {
         return RepetitionFactory::new();
     }
@@ -49,9 +63,58 @@ class Repetition extends Model
         return new RepeatCollection($models);
     }
 
+    /**
+     * Returns CarbonPeriod of Repetition.
+     */
+    public function toPeriod(): CarbonPeriod
+    {
+        /** @var CarbonPeriod $period */
+        $period = CarbonPeriod::since($this->start_at, true);
+
+        if ($this->end_at) {
+            $period->until($this->end_at, true);
+        }
+
+        if ($this->type === RepetitionType::Simple) {
+            $period->seconds($this->interval);
+        } else {
+            $period->addFilter(function (Carbon $date) {
+                $date = $date->clone()->addSeconds($this->tz_offset);
+
+                return ($this->year === '*' || (int) $this->year === $date->year)
+                    && ($this->month === '*' || (int) $this->month === $date->month)
+                    && ($this->day === '*' || (int) $this->day === $date->day)
+                    && ($this->week === '*' || (int) $this->week === $date->week)
+                    && ($this->week_of_month === '*' || (int) $this->week_of_month === $date->weekOfMonth)
+                    && ($this->weekday === '*' || (int) $this->weekday === $date->dayOfWeek);
+            });
+        }
+
+        return $period;
+    }
+
+    public function nextOccurrence(Carbon $after): ?Carbon
+    {
+        if ($this->end_at?->lessThanOrEqualTo($after)) {
+            return null;
+        }
+
+        $period = $this->toPeriod();
+        $period->prependFilter(fn (Carbon $date) => $date->greaterThan($after));
+
+        try {
+            return $period->current();
+        } catch (UnreachableException) {
+            return null;
+        }
+    }
+
     /*-----------------------------------------------------
     * Relations
     -----------------------------------------------------*/
+    /**
+     * @return MorphTo<Model,self>
+     */
     public function repeatable(): MorphTo
     {
         return $this->morphTo('repeatable');
@@ -60,6 +123,10 @@ class Repetition extends Model
     /*-----------------------------------------------------
     * scopes
     -----------------------------------------------------*/
+    /**
+     * @param  Builder<self>  $query
+     * @return Builder<self>
+     */
     public function scopeWhereActiveForTheDate(Builder $query, Carbon $date): Builder
     {
         return $query->where('start_at', '<=', $date->toDateTimeString())
@@ -69,16 +136,25 @@ class Repetition extends Model
             );
     }
 
+    /**
+     * @param  Builder<self>  $query
+     * @return Builder<self>
+     */
     public function scopeWhereOccurresOn(Builder $query, Carbon $date): Builder
     {
         return $query
             ->WhereActiveForTheDate($date)
             ->where(
-                fn ($query) => $query->whereHasSimpleRecurringOn($date)
-                    ->orWhere(fn ($query) => $query->whereHasComplexRecurringOn($date))
+                fn (Builder $query) => $query
+                    ->whereHasSimpleRecurringOn($date)
+                    ->orWhere(fn (Builder $query) => $query->whereHasComplexRecurringOn($date))
             );
     }
 
+    /**
+     * @param  Builder<self>  $query
+     * @return Builder<self>
+     */
     public function scopeWhereOccurresBetween(Builder $query, Carbon $start, Carbon $end): Builder
     {
         $dates = CarbonPeriod::create(
@@ -88,25 +164,29 @@ class Repetition extends Model
 
         $query->where(function (Builder $query) use ($dates) {
             foreach ($dates as $date) {
-                $query->orWhere(fn ($query) => $query->whereOccurresOn($date));
+                $query->orWhere(fn (Builder $query) => $query->whereOccurresOn($date));
             }
         });
 
         return $query;
     }
 
+    /**
+     * @param  Builder<self>  $query
+     * @return Builder<self>
+     */
     public function scopeWhereHasSimpleRecurringOn(Builder $query, Carbon $date): Builder
     {
         $secondsInDay = 86399;
-        $timestamp = $date->clone()->utc()->timestamp;
+        $timestamp = $date->clone()->utc()->endOfDay()->timestamp;
+        $driver = $query->getConnection()->getConfig('driver'); // @phpstan-ignore-line
 
         $query
             ->where('type', RepetitionType::Simple);
 
-        $driver = $query->getConnection()->getConfig('driver');
         match ($driver) {
             'mysql' => $query->whereRaw('(?  - UNIX_TIMESTAMP(`start_at`)) % `interval` BETWEEN 0 AND ?', [$timestamp, $secondsInDay]),
-            'sqlite' => $query->whereRaw('(? - unixepoch(`start_at`)) % `interval` BETWEEN 0 AND ?', [$timestamp, $secondsInDay]),
+            'sqlite' => $query->whereRaw('(? - strftime("%s", `start_at`)) % `interval` BETWEEN 0 AND ?', [$timestamp, $secondsInDay]),
             'pgsql' => $query->whereRaw("MOD((? - DATE_PART('EPOCH', start_at))::INTEGER, interval) BETWEEN 0 AND ?", [$timestamp, $secondsInDay]),
             default => throw new DriverNotSupportedException($driver),
         };
@@ -114,12 +194,17 @@ class Repetition extends Model
         return $query;
     }
 
-    public function scopeWhereHasComplexRecurringOn(Builder $query, Carbon $date)
+    /**
+     * @param  Builder<self>  $query
+     * @return Builder<self>
+     */
+    public function scopeWhereHasComplexRecurringOn(Builder $query, Carbon $date): Builder
     {
-        $timestamp = $date->timestamp;
-        $driver = $query->getConnection()->getConfig('driver');
+        $timestamp = $date->clone()->utc()->endOfDay()->timestamp;
+        $driver = $query->getConnection()->getConfig('driver'); // @phpstan-ignore-line
 
         $query->where('type', RepetitionType::Complex);
+
         if ($driver == 'mysql') {
             return $query->whereRaw("(`year` = '*' or `year` = YEAR(FROM_UNIXTIME(? + `tz_offset`)))", [$timestamp])
                 ->whereRaw("(`month` = '*' or `month` = MONTH(FROM_UNIXTIME(? + `tz_offset`)))", [$timestamp])

@@ -19,7 +19,7 @@ class Task extends Model implements RepeatableContract
     /**
      * define the base date that we would use to calculate repetition start_at
      */
-    public function repetitionBaseDate(RepetitionType $type = null): Carbon
+    public function repetitionBaseDate(?RepetitionType $type = null): Carbon
     {
         return now();
     }

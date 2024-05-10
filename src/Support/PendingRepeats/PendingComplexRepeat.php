@@ -2,20 +2,12 @@
 
 namespace MohammedManssour\LaravelRecurringModels\Support\PendingRepeats;
 
-use MohammedManssour\LaravelRecurringModels\Contracts\Repeatable;
 use MohammedManssour\LaravelRecurringModels\Enums\RepetitionType;
 use MohammedManssour\LaravelRecurringModels\Exceptions\RepetitionEndsAfterNotAvailableException;
 
 class PendingComplexRepeat extends PendingRepeat
 {
     private array $rule;
-
-    public function __construct(
-        Repeatable $model
-    ) {
-        parent::__construct($model);
-        $this->start_at = $this->model->repetitionBaseDate(RepetitionType::Complex)->toImmutable();
-    }
 
     public function rule(string $year = '*', string $month = '*', string $day = '*', string $week = '*', string $weekOfMonth = '*', string $weekday = '*'): static
     {
@@ -51,5 +43,10 @@ class PendingComplexRepeat extends PendingRepeat
             'tz_offset' => $this->start_at->offset,
             'end_at' => $this->end_at,
         ]];
+    }
+
+    public function type(): RepetitionType
+    {
+        return RepetitionType::Complex;
     }
 }

@@ -12,23 +12,25 @@ class PendingEveryWeekRepeat extends PendingRepeat
     /**
      * days
      *
-     * @var Collection<integer, object>
+     * @var Collection<int, string>
      */
     private Collection $days;
 
+    /** @var Collection<int, array<string, string>> */
     private Collection $rules;
 
     public function __construct(Repeatable $model)
     {
         parent::__construct($model);
+
         $this->days = collect([]);
         $this->rules = collect([]);
     }
 
     /**
-     * repeat every week on specific days
+     * Repeat every week on specific days
      *
-     * $days acceptable = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday']
+     * @param  string[]  $days  acceptable = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday']
      */
     public function on(array $days): static
     {
@@ -44,6 +46,9 @@ class PendingEveryWeekRepeat extends PendingRepeat
         throw new RepetitionEndsAfterNotAvailableException();
     }
 
+    /**
+     * @return array<string, string>
+     */
     public function rules(): array
     {
         if ($this->rules->isEmpty()) {
@@ -58,7 +63,7 @@ class PendingEveryWeekRepeat extends PendingRepeat
         if ($this->days->isEmpty()) {
             $this->rules->push(
                 $this->getRule(
-                    strtolower($this->model->repetitionBaseDate(RepetitionType::Complex)->format('l'))
+                    strtolower($this->start_at->format('l'))
                 )
             );
 
@@ -68,6 +73,9 @@ class PendingEveryWeekRepeat extends PendingRepeat
         $this->rules = $this->days->map(fn ($day) => $this->getRule($day));
     }
 
+    /**
+     * @return array<string, string>
+     */
     private function getRule(string $day): array
     {
         $complexPattern = (new PendingComplexRepeat($this->model))
@@ -87,7 +95,15 @@ class PendingEveryWeekRepeat extends PendingRepeat
         $this->rules();
     }
 
-    private function weekdays()
+    public function type(): RepetitionType
+    {
+        return RepetitionType::Complex;
+    }
+
+    /**
+     * @return string[]
+     */
+    private function weekdays(): array
     {
         return ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
     }

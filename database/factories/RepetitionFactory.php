@@ -8,6 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 use MohammedManssour\LaravelRecurringModels\Enums\RepetitionType;
 use MohammedManssour\LaravelRecurringModels\Models\Repetition;
 
+/**
+ * @extends Factory<Repetition>
+ */
 class RepetitionFactory extends Factory
 {
     protected $model = Repetition::class;
@@ -18,7 +21,7 @@ class RepetitionFactory extends Factory
             'repeatable_id' => null,
             'repeatable_type' => null,
             'type' => RepetitionType::Simple,
-            'start_at' => Carbon::createFromDate(fake()->dateTime())->startOfHour(),
+            'start_at' => Carbon::make(fake()->dateTime())->startOfHour(),
             'interval' => $this->toSeconds(fake()->numberBetween(1, 30)),
             'year' => null,
             'month' => null,
@@ -33,7 +36,7 @@ class RepetitionFactory extends Factory
     public function morphs(Model $model): static
     {
         return $this->state([
-            'repeatable_id' => $model->id,
+            'repeatable_id' => $model->getKey(),
             'repeatable_type' => $model->getMorphClass(),
         ]);
     }
@@ -51,7 +54,7 @@ class RepetitionFactory extends Factory
         ]);
     }
 
-    public function interval($days = null): static
+    public function interval(?int $days = null): static
     {
         return $this->state([
             'interval' => $this->toSeconds($days ?? fake()->numberBetween(1, 30)),

@@ -6,14 +6,14 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    public function up()
+    public function up(): void
     {
         Schema::table('repetitions', function (Blueprint $table) {
             $table->string('week_of_month')->nullable()->after('week');
         });
     }
 
-    public function down()
+    public function down(): void
     {
         Schema::table('repetitions', function (Blueprint $table) {
             $table->dropColumn('week_of_month');

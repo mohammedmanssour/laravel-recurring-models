@@ -4,6 +4,7 @@ namespace MohammedManssour\LaravelRecurringModels\Support\PendingRepeats;
 
 use Carbon\CarbonInterface;
 use MohammedManssour\LaravelRecurringModels\Contracts\Repeatable;
+use MohammedManssour\LaravelRecurringModels\Enums\RepetitionType;
 use MohammedManssour\LaravelRecurringModels\Support\RepeatCollection;
 
 abstract class PendingRepeat
@@ -19,6 +20,7 @@ abstract class PendingRepeat
     public function __construct(Repeatable $model)
     {
         $this->model = $model;
+        $this->start_at = $this->model->repetitionBaseDate($this->type())->toImmutable();
     }
 
     public function endsAt(CarbonInterface $end_at): static
@@ -35,19 +37,22 @@ abstract class PendingRepeat
         return $this;
     }
 
-    public function repeatitions(): RepeatCollection
+    public function repetitions(): RepeatCollection
     {
-        return $this->model->repetitions()->makeMany($this->rules());
+        /** @var RepeatCollection $collection */
+        $collection = $this->model->repetitions()->makeMany($this->rules());
+
+        return $collection;
     }
 
-    public function save()
+    public function save(): void
     {
-        return $this->repeatitions()->save();
+        $this->repetitions()->save();
     }
 
     public function __destruct()
     {
-        return $this->save();
+        $this->save();
     }
 
     /**
@@ -59,4 +64,6 @@ abstract class PendingRepeat
      * translates repeat requirements to repeat settings array
      */
     abstract public function rules(): array;
+
+    abstract public function type(): RepetitionType;
 }
