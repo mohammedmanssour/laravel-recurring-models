@@ -1,16 +1,17 @@
 <?php
 
 use Carbon\Carbon;
-use MohammedManssour\LaravelRecurringModels\Enums\RepetitionType;
-use MohammedManssour\LaravelRecurringModels\Exceptions\RepetitionEndsAfterNotAvailableException;
-use MohammedManssour\LaravelRecurringModels\Tests\Stubs\Support\HasTask;
+use PHPUnit\Framework\Attributes\Test;
 use MohammedManssour\LaravelRecurringModels\Tests\TestCase;
+use MohammedManssour\LaravelRecurringModels\Enums\RepetitionType;
+use MohammedManssour\LaravelRecurringModels\Tests\Stubs\Support\HasTask;
+use MohammedManssour\LaravelRecurringModels\Exceptions\RepetitionEndsAfterNotAvailableException;
 
 class RepeatTest extends TestCase
 {
     use HasTask;
 
-    /** @test */
+    #[Test]
     public function it_creates_daily_repetition_for_task_with_no_end()
     {
         $this->task()
@@ -24,7 +25,7 @@ class RepeatTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_creates_daily_repetition_for_task_that_ends_in_a_specific_date()
     {
         $this->task()
@@ -39,7 +40,7 @@ class RepeatTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_create_daily_repetition_for_task_that_ends_after_n_times()
     {
         $this->task()
@@ -54,7 +55,7 @@ class RepeatTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_create_daily_repetition()
     {
         $this->task()
@@ -68,7 +69,7 @@ class RepeatTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_creates_daily_repetition_with_timezone()
     {
         Carbon::setTestNowAndTimezone(
@@ -88,7 +89,7 @@ class RepeatTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_creates_weekly_repetition()
     {
         $this->task()
@@ -105,7 +106,7 @@ class RepeatTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_creates_weekly_repetition_for_task_that_occrres_on_specific_days()
     {
         $days = ['sunday', 'tuesday', 'thursday'];
@@ -126,7 +127,7 @@ class RepeatTest extends TestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function it_creates_weekly_repetition_with_timezone()
     {
         Carbon::setTestNowAndTimezone(
@@ -149,7 +150,7 @@ class RepeatTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_creates_complex_repetition_patterns_for_task()
     {
         $this->task()
@@ -169,7 +170,7 @@ class RepeatTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_sets_start_date_explicitly()
     {
         $this->task()
@@ -182,7 +183,7 @@ class RepeatTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_throws_an_exception_when_using_endsAfter_with_complex_repeitions()
     {
         $this->expectException(RepetitionEndsAfterNotAvailableException::class);
@@ -194,9 +195,7 @@ class RepeatTest extends TestCase
             ->endsAfter(3);
     }
 
-    /**
-     * @test
-     * */
+    #[Test]
     public function it_creates_complex_repetition_with_timezone()
     {
         Carbon::setTestNowAndTimezone(

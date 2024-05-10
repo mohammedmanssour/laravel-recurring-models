@@ -1,18 +1,17 @@
 <?php
 
+use PHPUnit\Framework\Attributes\Test;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Carbon;
+use MohammedManssour\LaravelRecurringModels\Tests\TestCase;
 use MohammedManssour\LaravelRecurringModels\Models\Repetition;
 use MohammedManssour\LaravelRecurringModels\Tests\Stubs\Support\HasTask;
-use MohammedManssour\LaravelRecurringModels\Tests\TestCase;
 
 class RepetitionTest extends TestCase
 {
     use HasTask;
 
-    /**
-     * @test
-     * */
+    #[Test]
     public function it_checks_if_recurring_is_active_for_the_date()
     {
         // repeat start at 2023-04-15 00:00:00 and ends at 2023-04-15
@@ -29,7 +28,7 @@ class RepetitionTest extends TestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function it_checks_if_simple_repetition_occurres_on_specific_day()
     {
         // repeat start at 2023-04-15 00:00:00
@@ -67,7 +66,7 @@ class RepetitionTest extends TestCase
         $this->assertNull(Repetition::whereHasComplexRecurringOn($date)->first());
     }
 
-    /** @test */
+    #[Test]
     public function it_checks_if_simple_repetition_occurres_on_specific_day_with_timezone()
     {
         Carbon::setTestNowAndTimezone(
@@ -89,7 +88,7 @@ class RepetitionTest extends TestCase
         $this->assertNull($model);
     }
 
-    /** @test */
+    #[Test]
     public function it_checks_if_simple_repetition_occurres_on_specific_dates_after_end_date()
     {
         $this->repetition($this->task(), '2023-04-23 00:00:00');
@@ -98,7 +97,7 @@ class RepetitionTest extends TestCase
         $this->assertNull($model);
     }
 
-    /** @test */
+    #[Test]
     public function it_checks_if_simple_repetition_occurres_between_two_specific_dates()
     {
         // repeat start at 2023-04-15 00:00:00
@@ -119,7 +118,7 @@ class RepetitionTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_checks_if_complex_repetition_occurres_on_specific_dates()
     {
         Carbon::setTestNow(
@@ -149,7 +148,7 @@ class RepetitionTest extends TestCase
         $this->assertNull(Repetition::whereOccurresOn(Carbon::make('2023-05-19'))->first());
     }
 
-    /** @test */
+    #[Test]
     public function it_checks_if_complex_repetition_occurres_on_specific_dates_with_timezone()
     {
         Carbon::setTestNowAndTimezone(
@@ -182,7 +181,7 @@ class RepetitionTest extends TestCase
         $this->assertNull(Repetition::whereOccurresOn(Carbon::make('2023-05-19'))->first());
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_correct_period()
     {
         // repeat start at 2023-04-15 00:00:00
@@ -196,7 +195,7 @@ class RepetitionTest extends TestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_correct_next_simple_repetition()
     {
         // repeat start at 2023-04-15 00:00:00
@@ -207,7 +206,7 @@ class RepetitionTest extends TestCase
         $this->assertEquals(null, $repetition->nextOccurrence(Carbon::make('2023-04-30')));
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_correct_next_complex_repetition()
     {
         Carbon::setTestNow(
