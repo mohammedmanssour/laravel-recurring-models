@@ -1,11 +1,11 @@
 <?php
 
-use PHPUnit\Framework\Attributes\Test;
 use Illuminate\Support\Carbon;
-use MohammedManssour\LaravelRecurringModels\Tests\TestCase;
 use MohammedManssour\LaravelRecurringModels\Models\Repetition;
 use MohammedManssour\LaravelRecurringModels\Tests\Stubs\Models\Task;
 use MohammedManssour\LaravelRecurringModels\Tests\Stubs\Support\HasTask;
+use MohammedManssour\LaravelRecurringModels\Tests\TestCase;
+use PHPUnit\Framework\Attributes\Test;
 
 class RepeatableTest extends TestCase
 {

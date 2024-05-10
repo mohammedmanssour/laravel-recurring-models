@@ -1,11 +1,11 @@
 <?php
 
 use Carbon\Carbon;
-use PHPUnit\Framework\Attributes\Test;
-use MohammedManssour\LaravelRecurringModels\Tests\TestCase;
 use MohammedManssour\LaravelRecurringModels\Enums\RepetitionType;
-use MohammedManssour\LaravelRecurringModels\Tests\Stubs\Support\HasTask;
 use MohammedManssour\LaravelRecurringModels\Exceptions\RepetitionEndsAfterNotAvailableException;
+use MohammedManssour\LaravelRecurringModels\Tests\Stubs\Support\HasTask;
+use MohammedManssour\LaravelRecurringModels\Tests\TestCase;
+use PHPUnit\Framework\Attributes\Test;
 
 class RepeatTest extends TestCase
 {
