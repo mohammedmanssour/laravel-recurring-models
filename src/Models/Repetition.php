@@ -185,6 +185,7 @@ class Repetition extends Model
             ->where('type', RepetitionType::Simple);
 
         match ($driver) {
+            'mariadb' => $query->whereRaw('(?  - UNIX_TIMESTAMP(`start_at`)) % `interval` BETWEEN 0 AND ?', [$timestamp, $secondsInDay]),
             'mysql' => $query->whereRaw('(?  - UNIX_TIMESTAMP(`start_at`)) % `interval` BETWEEN 0 AND ?', [$timestamp, $secondsInDay]),
             'sqlite' => $query->whereRaw('(? - strftime("%s", `start_at`)) % `interval` BETWEEN 0 AND ?', [$timestamp, $secondsInDay]),
             'pgsql' => $query->whereRaw("MOD((? - DATE_PART('EPOCH', start_at))::INTEGER, interval) BETWEEN 0 AND ?", [$timestamp, $secondsInDay]),
@@ -205,7 +206,7 @@ class Repetition extends Model
 
         $query->where('type', RepetitionType::Complex);
 
-        if ($driver == 'mysql') {
+        if ($driver == 'mariadb' || $driver == 'mysql') {
             return $query->whereRaw("(`year` = '*' or `year` = YEAR(FROM_UNIXTIME(? + `tz_offset`)))", [$timestamp])
                 ->whereRaw("(`month` = '*' or `month` = MONTH(FROM_UNIXTIME(? + `tz_offset`)))", [$timestamp])
                 ->whereRaw("(`day` = '*' or `day` = DAY(FROM_UNIXTIME(? + `tz_offset`)))", [$timestamp])
